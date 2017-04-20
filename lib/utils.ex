@@ -25,7 +25,7 @@ defmodule CachingPool.Utils do
   def server_opts(opts) do
     name = opts |> name_from_opts
 
-    {server_opts, _} = Keyword.split(opts, [:size, :max_overflow, :module])
+    {server_opts, _} = Keyword.split(opts, [:max_concurrency, :module])
     
     [server_opts |> Keyword.put(:name, name)]
   end
@@ -36,10 +36,9 @@ defmodule CachingPool.Utils do
   end
 
   def poolboy_opts(opts) do
-    size = Keyword.get(opts, :size, @default_poolboy_size)
-    max_overflow = Keyword.get(opts, :max_overflow, @default_poolboy_max_overflow)
+    max_concurrency = Keyword.get(opts, :max_concurrency, @default_poolboy_size)
 
-    [worker_module: CachingPool.Worker, size: size, max_overflow: max_overflow]
+    [worker_module: CachingPool.Worker, size: max_concurrency, max_overflow: @default_poolboy_max_overflow]
   end
 
   def poolboy_module_opts(opts) do

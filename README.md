@@ -1,6 +1,40 @@
 # CachingPool
 
-**TODO: Add description**
+Wraps a given module with a caching pool. This handles a very specific use case I encountered a lot. Given a particular module, every function call made to it with identical arguments should trigger only one call with all of the calls receiving the same response. Additionally, there should be a maximum number of concurrent requests with differing arguments. This is primarily useful with remote APIs.
+
+## Basic Usage
+
+```elixir
+{:ok, _} = CachingPool.Supervisor.start_link(module: :hackney, max_concurrency: 2, ttl: 50)
+
+# makes an http request to www.apple.com
+IO.inspect CachingPool.call(:hackney, :request, ["http://www.apple.com"])
+
+# retrieves the previously cached result
+IO.inspect CachingPool.call(:hackney, :request, ["http://www.apple.com"])
+
+# makes an http request to www.cnn.com
+IO.inspect CachingPool.call(:hackney, :request, ["http://www.cnn.com"])
+```
+
+## `Easy` Macro Usage
+
+```elixir
+defmodule WrappedAPI do
+  use CachingPool.Easy, module: :hackney, ttl: 500, max_concurrency: 2
+end
+
+{:ok, _} = WrappedAPI.start_link
+
+# makes an http request to www.apple.com
+IO.inspect WrappedAPI.request("http://www.apple.com")
+
+# makes an http request to www.cnn.com
+IO.inspect WrappedAPI.request("http://www.cnn.com")
+
+# retrieves the previously cached result
+IO.inspect WrappedAPI.request("http://www.apple.com")
+```
 
 ## Installation
 

@@ -9,11 +9,10 @@ defmodule CachingPool.Easy do
     module = opts |> Keyword.get(:module) |> Macro.expand(__CALLER__)
     calls = module |> get_module_calls
     name = Keyword.get(opts, :name, module)
-    size = Keyword.get(opts, :size, 10)
-    max_overflow = Keyword.get(opts, :max_overflow, 10)
+    max_concurrency = Keyword.get(opts, :max_concurrency, 10)
     ttl = Keyword.get(opts, :ttl)
     
-    start_opts = [name: name, module: module, size: size, max_overflow: max_overflow, ttl: ttl]
+    start_opts = [name: name, module: module, max_concurrency: max_concurrency, ttl: ttl]
     
     quote bind_quoted: [calls: calls, module: module, proc_name: name, start_opts: start_opts] do
       def start_link(opts \\ [])
