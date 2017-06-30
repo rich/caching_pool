@@ -20,7 +20,7 @@ defmodule CachingPool.Easy do
         CachingPool.Supervisor.start_link(unquote(start_opts))
       end
       
-      for call <- calls, {name, args, _, _} <- Kernel.Utils.defdelegate(CachingPool.Easy.to_quoted(call), []) do
+      for call <- calls, {name, args, _, _} <- List.wrap(Kernel.Utils.defdelegate(CachingPool.Easy.to_quoted(call), [])) do
         def unquote(name)(unquote_splicing(args)) do
           CachingPool.call(unquote(proc_name), unquote(name), [unquote_splicing(args)])
         end
